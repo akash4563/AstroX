@@ -7,7 +7,8 @@ import AnimeGodLoading from './animations/AnimeGodLoading';
 import NorthIndianChart from './charts/NorthIndianChart';
 import SouthIndianChart from './charts/SouthIndianChart';
 import PlanetaryTable from './tables/PlanetaryTable';
-import DoshaAnalysis from './tables/DoshaAnalysis';
+import AspectsTable from './tables/AspectsTable';
+import HousesTable from './tables/HousesTable';
 
 export default function Hero() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -210,9 +211,13 @@ export default function Hero() {
               <div className="flex items-center justify-between mb-8">
                 <div>
                   <h2 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-saffron to-electric-blue">
-                    {formData.name || 'Your'} Cosmic Blueprint
+                    {kundliData.subject?.name || formData.name || 'Your'} Cosmic Blueprint
                   </h2>
-                  <p className="text-gray-400 mt-2">Ascendant: <span className="text-white">{kundliData.ascendant}</span> | Moon Sign: <span className="text-white">{kundliData.moonSign}</span></p>
+                  <p className="text-gray-400 mt-2">
+                    Ascendant: <span className="text-white">{kundliData.angles_details?.asc?.sign}</span> |
+                    Sun Sign: <span className="text-white">{kundliData.planets?.find((p:any) => p.id === 'sun')?.sign}</span> |
+                    Moon Sign: <span className="text-white">{kundliData.planets?.find((p:any) => p.id === 'moon')?.sign}</span>
+                  </p>
                 </div>
                 <button
                   onClick={() => setShowResult(false)}
@@ -223,15 +228,14 @@ export default function Hero() {
                 </button>
               </div>
 
-              {/* Charts Row */}
+              {/* Data Tables (Western Comprehensive) */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <NorthIndianChart ascendant={kundliData.ascendant} planets={kundliData.planets} />
-                <SouthIndianChart planets={kundliData.planets} />
+                 <PlanetaryTable planets={kundliData.planets || []} />
+                 <AspectsTable aspects={kundliData.aspects || []} />
               </div>
-
-              {/* Data Tables */}
-              <DoshaAnalysis doshas={kundliData.doshas} />
-              <PlanetaryTable planets={kundliData.planets} />
+              <div className="mt-8">
+                 <HousesTable houses={kundliData.houses || []} />
+              </div>
 
             </motion.div>
           )}
