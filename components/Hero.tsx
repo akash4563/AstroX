@@ -14,6 +14,7 @@ export default function Hero() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [kundliData, setKundliData] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -50,13 +51,18 @@ export default function Hero() {
         body: JSON.stringify(payload)
       });
 
-      if (res.ok) {
-        const data = await res.json();
+      const data = await res.json();
+
+      if (res.ok && data.status === 'success') {
         setKundliData(data.data);
         setShowResult(true);
+        setError(null);
+      } else {
+        setError(data.error || "Failed to generate chart. Please try again.");
       }
     } catch (error) {
       console.error("Failed to generate Kundli", error);
+      setError("Network error occurred. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -161,6 +167,13 @@ export default function Hero() {
                     {/* Note: Google Places Autocomplete would wrap this input */}
                   </div>
                 </div>
+
+                {/* Error Message */}
+                {error && (
+                  <div className="text-red-400 text-sm text-center bg-red-900/20 py-2 px-4 rounded-lg border border-red-500/30">
+                    {error}
+                  </div>
+                )}
 
                 {/* Submit Button */}
                 <motion.button
