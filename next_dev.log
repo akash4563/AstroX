@@ -1,0 +1,13 @@
+
+> kundli-app@0.1.0 dev
+> next dev
+
+▲ Next.js 16.2.10 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.2:3000
+✓ Ready in 525ms
+
+○ Compiling / ...
+ GET / 200 in 8.3s (next.js: 7.5s, application-code: 847ms)
+[Kundli API Proxy] Forwarding request for Arjun
+ POST /api/kundli 200 in 2.5s (next.js: 506ms, application-code: 2.0s)
