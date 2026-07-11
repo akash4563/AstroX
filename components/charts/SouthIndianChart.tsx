@@ -37,7 +37,7 @@ export default function SouthIndianChart({ planets }: SouthIndianChartProps) {
           }
 
           const signName = signs[signIndex];
-          const signPlanets = planets.filter(p => p.sign === signName);
+          const signPlanets = planets?.filter(p => p.sign === signName) || [];
 
           return (
             <div key={i} className="border border-electric-blue/50 p-1 flex flex-col relative overflow-hidden">

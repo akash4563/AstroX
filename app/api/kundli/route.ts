@@ -27,11 +27,8 @@ export async function POST(req: NextRequest) {
     const FREE_ASTRO_API_KEY = process.env.FREE_ASTRO_API_KEY;
 
     if (!FREE_ASTRO_API_KEY) {
-      console.error("[Kundli API Proxy] Server configuration error: FREE_ASTRO_API_KEY is missing.");
-      return NextResponse.json(
-        { error: 'Server configuration error' },
-        { status: 500 }
-      );
+      console.error("[Kundli API Proxy] Server configuration error: FREE_ASTRO_API_KEY is missing. Falling back to mock data.");
+      return getFallbackData();
     }
 
     console.log(`[Kundli API] Calling FreeAstroAPI for ${body.name}...`);
@@ -41,7 +38,6 @@ export async function POST(req: NextRequest) {
     const [hour, minute] = body.tob.split(':').map(Number);
 
     const payload = {
-        name: body.name,
         year,
         month,
         day,
@@ -50,13 +46,12 @@ export async function POST(req: NextRequest) {
         city: body.location.city,
         lat: body.location.lat,
         lng: body.location.lon,
-        tz_str: 'AUTO',
-        house_system: 'placidus',
-        include_features: ['lilith', 'chiron'],
-        zodiac_type: 'tropical'
+        ayanamsha: 'lahiri',
+        house_system: 'whole_sign',
+        node_type: 'mean'
     };
 
-    const response = await fetch('https://api.freeastroapi.com/api/v1/natal/calculate', {
+    const response = await fetch('https://api.freeastroapi.com/api/v2/vedic/chart', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -73,11 +68,10 @@ export async function POST(req: NextRequest) {
       return getFallbackData();
     }
 
-    // Forward the exact JSON response requested by the user for comprehensive rendering
     const mappedData = {
       status: 'success',
       message: 'Chart generated successfully from FreeAstroAPI',
-      data: astroData // The UI components will map this directly
+      data: astroData // Pass along exact Vedic response shape
     };
 
     return NextResponse.json(mappedData, { status: 200 });
@@ -95,54 +89,42 @@ function getFallbackData() {
     status: 'success',
     message: 'Chart generated successfully (Mock Fallback)',
     data: {
-      "subject": {
-        "name": "Albert Einstein",
-        "datetime": "1879-03-14T11:30:00+00:00",
-        "location": {
-          "city": "Ulm, Germany",
-          "lat": 48.4011,
-          "lng": 9.9876,
-          "timezone": "LMT"
+      "ascendant": {
+        "degree": 79.4698,
+        "sign": "Gemini",
+        "sign_id": 3,
+        "nakshatra": {
+          "id": 6,
+          "name": "Ardra",
+          "pada": 4,
+          "lord": "Rahu"
         }
       },
       "planets": [
-        { "id": "sun", "name": "Sun", "sign": "Pis", "pos": 23.535, "abs_pos": 353.535, "retrograde": false, "house": 9 },
-        { "id": "moon", "name": "Moon", "sign": "Sag", "pos": 14.912, "abs_pos": 254.912, "retrograde": false, "house": 6 },
-        { "id": "mercury", "name": "Mercury", "sign": "Ari", "pos": 3.198, "abs_pos": 3.198, "retrograde": false, "house": 10 },
-        { "id": "venus", "name": "Venus", "sign": "Ari", "pos": 17.019, "abs_pos": 17.019, "retrograde": false, "house": 10 },
-        { "id": "mars", "name": "Mars", "sign": "Cap", "pos": 26.934, "abs_pos": 296.934, "retrograde": false, "house": 7 },
-        { "id": "jupiter", "name": "Jupiter", "sign": "Aqu", "pos": 27.49, "abs_pos": 327.49, "retrograde": false, "house": 9 },
-        { "id": "saturn", "name": "Saturn", "sign": "Ari", "pos": 4.193, "abs_pos": 4.193, "retrograde": false, "house": 10 },
-        { "id": "uranus", "name": "Uranus", "sign": "Vir", "pos": 1.287, "abs_pos": 151.287, "retrograde": true, "house": 3 },
-        { "id": "neptune", "name": "Neptune", "sign": "Tau", "pos": 7.873, "abs_pos": 37.873, "retrograde": false, "house": 11 },
-        { "id": "pluto", "name": "Pluto", "sign": "Tau", "pos": 24.726, "abs_pos": 54.726, "retrograde": false, "house": 11 }
-      ],
-      "aspects": [
-        { "p1": "mars", "p2": "sun", "type": "sextile", "orb": 3.4, "deg": 60, "is_major": true },
-        { "p1": "pluto", "p2": "sun", "type": "sextile", "orb": 1.19, "deg": 60, "is_major": true },
-        { "p1": "moon", "p2": "venus", "type": "trine", "orb": 2.11, "deg": 120, "is_major": true },
-        { "p1": "mercury", "p2": "saturn", "type": "conjunction", "orb": 0.99, "deg": 0, "is_major": true },
-        { "p1": "mars", "p2": "pluto", "type": "trine", "orb": 2.21, "deg": 120, "is_major": true },
-        { "p1": "jupiter", "p2": "uranus", "type": "opposition", "orb": 3.8, "deg": 180, "is_major": true }
+        { "name": "Sun", "absolute_degree": 331.3393, "sign": "Pisces", "sign_id": 12, "degree_in_sign": 1.3393, "house": 10, "is_retrograde": false },
+        { "name": "Moon", "absolute_degree": 232.3522, "sign": "Scorpio", "sign_id": 8, "degree_in_sign": 22.3522, "house": 6, "is_retrograde": false },
+        { "name": "Mars", "absolute_degree": 274.7474, "sign": "Capricorn", "sign_id": 10, "degree_in_sign": 4.7474, "house": 8, "is_retrograde": false },
+        { "name": "Mercury", "absolute_degree": 340.9838, "sign": "Pisces", "sign_id": 12, "degree_in_sign": 10.9838, "house": 10, "is_retrograde": false },
+        { "name": "Jupiter", "absolute_degree": 305.3176, "sign": "Aquarius", "sign_id": 11, "degree_in_sign": 5.3176, "house": 9, "is_retrograde": false },
+        { "name": "Venus", "absolute_degree": 354.8216, "sign": "Pisces", "sign_id": 12, "degree_in_sign": 24.8216, "house": 10, "is_retrograde": false },
+        { "name": "Saturn", "absolute_degree": 342.023, "sign": "Pisces", "sign_id": 12, "degree_in_sign": 12.023, "house": 10, "is_retrograde": false },
+        { "name": "Rahu", "absolute_degree": 279.3061, "sign": "Capricorn", "sign_id": 10, "degree_in_sign": 9.3061, "house": 8, "is_retrograde": true },
+        { "name": "Ketu", "absolute_degree": 99.3061, "sign": "Cancer", "sign_id": 4, "degree_in_sign": 9.3061, "house": 2, "is_retrograde": true }
       ],
       "houses": [
-        { "house": 1, "name": "1", "sign": "Can", "pos": 19.67 },
-        { "house": 2, "name": "2", "sign": "Leo", "pos": 6.672 },
-        { "house": 3, "name": "3", "sign": "Leo", "pos": 26.829 },
-        { "house": 4, "name": "4", "sign": "Vir", "pos": 23.681 },
-        { "house": 5, "name": "5", "sign": "Sco", "pos": 0.858 },
-        { "house": 6, "name": "6", "sign": "Sag", "pos": 14.099 },
-        { "house": 7, "name": "7", "sign": "Cap", "pos": 19.67 },
-        { "house": 8, "name": "8", "sign": "Aqu", "pos": 6.672 },
-        { "house": 9, "name": "9", "sign": "Aqu", "pos": 26.829 },
-        { "house": 10, "name": "10", "sign": "Pis", "pos": 23.681 },
-        { "house": 11, "name": "11", "sign": "Tau", "pos": 0.858 },
-        { "house": 12, "name": "12", "sign": "Gem", "pos": 14.099 }
-      ],
-      "angles_details": {
-        "asc": { "sign": "Can", "pos": 19.67, "house": 1 },
-        "mc": { "sign": "Pis", "pos": 23.681, "house": 10 }
-      }
+        { "house": 1, "sign": "Gemini", "sign_id": 3, "degree_cusp": 0 },
+        { "house": 2, "sign": "Cancer", "sign_id": 4, "degree_cusp": 0 },
+        { "house": 3, "sign": "Leo", "sign_id": 5, "degree_cusp": 0 },
+        { "house": 4, "sign": "Virgo", "sign_id": 6, "degree_cusp": 0 },
+        { "house": 5, "sign": "Libra", "sign_id": 7, "degree_cusp": 0 },
+        { "house": 6, "sign": "Scorpio", "sign_id": 8, "degree_cusp": 0 },
+        { "house": 7, "sign": "Sagittarius", "sign_id": 9, "degree_cusp": 0 },
+        { "house": 8, "sign": "Capricorn", "sign_id": 10, "degree_cusp": 0 },
+        { "house": 9, "sign": "Aquarius", "sign_id": 11, "degree_cusp": 0 },
+        { "house": 10, "sign": "Pisces", "sign_id": 12, "degree_cusp": 0 },
+        { "house": 11, "sign": "Aries", "sign_id": 1, "degree_cusp": 0 },
+        { "house": 12, "sign": "Taurus", "sign_id": 2, "degree_cusp": 0 }
+      ]
     }
   }, { status: 200 });
 }

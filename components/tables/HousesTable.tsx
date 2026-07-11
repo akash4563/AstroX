@@ -3,9 +3,8 @@ import { Home } from 'lucide-react';
 
 interface House {
   house: number;
-  name: string;
   sign: string;
-  pos: number;
+  degree_cusp: number;
 }
 
 interface HousesTableProps {
@@ -33,7 +32,7 @@ export default function HousesTable({ houses }: HousesTableProps) {
               <tr key={house.house} className={`border-b border-white/5 hover:bg-white/5 transition-colors ${index % 2 === 0 ? 'bg-transparent' : 'bg-black/20'}`}>
                 <td className="px-6 py-4 font-bold text-saffron">{house.house}</td>
                 <td className="px-6 py-4 text-white font-medium">{house.sign}</td>
-                <td className="px-6 py-4">{house.pos?.toFixed(2)}°</td>
+                <td className="px-6 py-4">{house.degree_cusp?.toFixed(2)}°</td>
               </tr>
             ))}
           </tbody>
