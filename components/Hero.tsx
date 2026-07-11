@@ -2,27 +2,17 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Lottie from 'lottie-react';
-import { Sparkles, MapPin, Calendar, Clock, User } from 'lucide-react';
-
-// A simple mock Lottie JSON for demonstration (usually you'd load a real file from public/)
-// This is a minimal valid Lottie JSON to prevent errors if lottie-react tries to parse it.
-const mockGodManifestationAnimation = {
-  "v": "5.5.2",
-  "fr": 60,
-  "ip": 0,
-  "op": 60,
-  "w": 500,
-  "h": 500,
-  "nm": "Loading",
-  "ddd": 0,
-  "assets": [],
-  "layers": []
-};
+import { Sparkles, MapPin, Calendar, Clock, User, ArrowLeft } from 'lucide-react';
+import AnimeGodLoading from './animations/AnimeGodLoading';
+import NorthIndianChart from './charts/NorthIndianChart';
+import SouthIndianChart from './charts/SouthIndianChart';
+import PlanetaryTable from './tables/PlanetaryTable';
+import DoshaAnalysis from './tables/DoshaAnalysis';
 
 export default function Hero() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showResult, setShowResult] = useState(false);
+  const [kundliData, setKundliData] = useState<any>(null);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -60,6 +50,8 @@ export default function Hero() {
       });
 
       if (res.ok) {
+        const data = await res.json();
+        setKundliData(data.data);
         setShowResult(true);
       }
     } catch (error) {
@@ -76,7 +68,7 @@ export default function Hero() {
         {/* Three.js canvas would go here */}
       </div>
 
-      <div className="relative z-10 w-full max-w-xl">
+      <div className={`relative z-10 w-full ${showResult ? 'max-w-6xl' : 'max-w-xl'}`}>
         <AnimatePresence mode="wait">
           {!isSubmitting && !showResult && (
             <motion.div
@@ -115,7 +107,7 @@ export default function Hero() {
                 </div>
 
                 {/* Gender & DOB Row */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="relative">
                     <select
                       name="gender"
@@ -142,7 +134,7 @@ export default function Hero() {
                 </div>
 
                 {/* TOB & City Row */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="relative">
                     <Clock className="absolute left-4 top-1/2 -translate-y-1/2 text-electric-blue w-5 h-5" />
                     <input
@@ -194,23 +186,7 @@ export default function Hero() {
               transition={{ duration: 1 }}
               className="flex flex-col items-center justify-center text-center"
             >
-              <div className="w-64 h-64 relative mb-8">
-                {/* Glowing aura */}
-                <div className="absolute inset-0 bg-saffron rounded-full blur-3xl opacity-20 animate-pulse" />
-                <div className="absolute inset-0 bg-electric-blue rounded-full blur-2xl opacity-20 animate-pulse delay-75" />
-
-                {/* Lottie Animation */}
-                <Lottie
-                  animationData={mockGodManifestationAnimation}
-                  loop={true}
-                  className="w-full h-full relative z-10"
-                />
-
-                {/* Placeholder text for missing Lottie */}
-                <div className="absolute inset-0 flex items-center justify-center text-saffron/50 text-sm italic z-0">
-                  [Deity Manifests]
-                </div>
-              </div>
+              <AnimeGodLoading />
 
               <motion.h2
                 animate={{ opacity: [0.5, 1, 0.5] }}
@@ -223,22 +199,40 @@ export default function Hero() {
             </motion.div>
           )}
 
-          {/* Success Result Placeholder */}
-          {showResult && !isSubmitting && (
+          {/* Success Result View */}
+          {showResult && !isSubmitting && kundliData && (
             <motion.div
               key="result"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="glass-panel p-8 rounded-3xl text-center border border-electric-blue/30 shadow-[0_0_100px_rgba(0,229,255,0.2)]"
+              className="w-full max-w-6xl mx-auto"
             >
-              <h2 className="text-3xl font-bold text-white mb-4">Chart Generated</h2>
-              <p className="text-gray-400 mb-8">The cosmic energies have been decoded.</p>
-              <button
-                onClick={() => setShowResult(false)}
-                className="text-electric-blue hover:text-white transition-colors"
-              >
-                ← Return to form
-              </button>
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <h2 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-saffron to-electric-blue">
+                    {formData.name || 'Your'} Cosmic Blueprint
+                  </h2>
+                  <p className="text-gray-400 mt-2">Ascendant: <span className="text-white">{kundliData.ascendant}</span> | Moon Sign: <span className="text-white">{kundliData.moonSign}</span></p>
+                </div>
+                <button
+                  onClick={() => setShowResult(false)}
+                  className="flex items-center gap-2 text-electric-blue hover:text-white transition-colors bg-white/5 px-4 py-2 rounded-full border border-white/10"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  <span>Back</span>
+                </button>
+              </div>
+
+              {/* Charts Row */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <NorthIndianChart ascendant={kundliData.ascendant} planets={kundliData.planets} />
+                <SouthIndianChart planets={kundliData.planets} />
+              </div>
+
+              {/* Data Tables */}
+              <DoshaAnalysis doshas={kundliData.doshas} />
+              <PlanetaryTable planets={kundliData.planets} />
+
             </motion.div>
           )}
         </AnimatePresence>

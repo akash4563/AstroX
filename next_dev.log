@@ -11,3 +11,12 @@
  GET / 200 in 8.3s (next.js: 7.5s, application-code: 847ms)
 [Kundli API Proxy] Forwarding request for Arjun
  POST /api/kundli 200 in 2.5s (next.js: 506ms, application-code: 2.0s)
+ GET / 200 in 1207ms (next.js: 504ms, application-code: 703ms)
+[Kundli API Proxy] Forwarding request for Arjun
+ POST /api/kundli 200 in 2.2s (next.js: 176ms, application-code: 2.0s)
+ GET / 200 in 71ms (next.js: 5ms, application-code: 66ms)
+[Kundli API Proxy] Forwarding request for Arjun
+ POST /api/kundli 200 in 2.0s (next.js: 3ms, application-code: 2.0s)
+ GET / 200 in 63ms (next.js: 3ms, application-code: 60ms)
+[Kundli API Proxy] Forwarding request for Arjun
+ POST /api/kundli 200 in 2.0s (next.js: 3ms, application-code: 2.0s)
